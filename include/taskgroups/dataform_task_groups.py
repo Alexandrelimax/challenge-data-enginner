@@ -6,9 +6,9 @@ class DataformWorkflowTaskGroup(TaskGroup):
     def __init__(self, group_id, project_id, region, repository_id, **kwargs):
         super().__init__(group_id=group_id, **kwargs)
 
+        hook = DataformHook()
         @task(task_group=self)
         def create_compilation_result():
-            hook = DataformHook()
             compilation_result = {}
             result = hook.create_compilation_result(
                 project_id=project_id,
@@ -20,7 +20,6 @@ class DataformWorkflowTaskGroup(TaskGroup):
 
         @task(task_group=self)
         def start_workflow_invocation(compilation_result_name):
-            hook = DataformHook()
             workflow_invocation = {
                 'compilation_result': compilation_result_name,
             }
@@ -34,7 +33,6 @@ class DataformWorkflowTaskGroup(TaskGroup):
 
         @task(task_group=self)
         def monitor_workflow_invocation(workflow_invocation_name):
-            hook = DataformHook()
             hook.wait_for_workflow_invocation(
                 workflow_invocation_id=workflow_invocation_name,
                 repository_id=repository_id,
